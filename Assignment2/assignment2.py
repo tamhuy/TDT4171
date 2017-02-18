@@ -6,6 +6,7 @@ xt1xt = np.array([[0.7, 0.3], [0.3, 0.7]])  # Chance that it rains given weather
 initial = np.array([0.5, 0.5])
 evidence = [True, True, False, True, True]    # Sequence of observations
 evidence2 = [True, True]  # Used for checking if results are the same as in the book/slides
+evidence3 = [False, True, False, True, False]
 
 
 # Based on equation 15.5 on page 572 and on the lecture slides
@@ -79,6 +80,6 @@ def main():
 
     print "\n", "-" * 10
     print "Viterbi: "
-    viterbi(evidence, initial)          # Task C
+    viterbi(evidence3, initial)          # Task C
 
 main()
