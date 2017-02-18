@@ -48,7 +48,7 @@ def forwardBackward(ev, prior):
         print "b: ", b
         sv[i] = normalize(np.multiply(fv[i], b))    # Normalize and update backwards messages
         b = backward(b, [ev[i-1]])
-    print "Smoothed values: ", sv
+        print "Smoothed Value: ", sv[i]
     return sv
 
 
