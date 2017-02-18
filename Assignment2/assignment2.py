@@ -3,9 +3,9 @@ import numpy as np
 uT = np.array([[0.9, 0.0], [0.0, 0.2]]) # Chance of rain given umbrella
 uF = np.array([[0.1, 0.0], [0.0, 0.8]]) # Chance of rain given no umbrella
 xt1xt = np.array([[0.7, 0.3], [0.3, 0.7]])  # Chance that it rains given weather the day before
-prior = np.array([0.5, 0.5])
-ev = [True, True, False, True, True]    # Sequence of observations
-ev2 = [True, True]  # Used for checking if results are the same as in the book/slides
+initial = np.array([0.5, 0.5])
+evidence = [True, True, False, True, True]    # Sequence of observations
+evidence2 = [True, True]  # Used for checking if results are the same as in the book/slides
 
 
 # Based on equation 15.5 on page 572 and on the lecture slides
@@ -35,7 +35,7 @@ def backward(b, ev):
 
 
 # Based on figure 15.4 on page 576
-def forwardBackward(ev, prior):
+def forwardbackward(ev, prior):
     fv = np.array([None] * (len(ev) + 1))   # Initialize the vector of forward messages
     sv = np.array([None] * (len(ev) + 1))   # Initialize the vector of backward messages
     fv[0] = prior   # First known step
@@ -52,32 +52,33 @@ def forwardBackward(ev, prior):
     return sv
 
 
+# Based on equation 5.11 on page 577
 def viterbi(ev, prior):
-    xT, xF = np.array([None] * len(ev)), np.array([None] * len(ev))
-    init = forward([ev[0]], prior)
-    xT[0], xF[0] = init[0], init[1]     # True
+    xt, xf = np.array([None] * len(ev)), np.array([None] * len(ev))     # Initializing empty arrays
+    init = forward([ev[0]], prior)  # Initial values
+    xt[0], xf[0] = init[0], init[1]
 
     for i in range(1, len(ev)):
-        if ev[i]:
-            xT[i] = (uT[0][0] * max(xt1xt[0][0] * xT[i-1], xt1xt[0][1] * xF[i-1]))  # true
-            xF[i] = (uT[1][1] * max(xt1xt[0][1] * xT[i-1], xt1xt[0][0] * xF[i-1]))  # true
-        else:
-            xT[i] = (uF[0][0] * max(xt1xt[0][0] * xT[i-1], xt1xt[0][1] * xF[i-1]))  # false
-            xF[i] = (uF[1][1] * max(xt1xt[0][1] * xT[i-1], xt1xt[0][0] * xF[i-1]))  # false
-    print "xT: ", xT
-    print "xF: ", xF
+        if ev[i]:   # If an umbrella is observed
+            xt[i] = (uT[0][0] * max(xt1xt[0][0] * xt[i-1], xt1xt[0][1] * xf[i-1]))
+            xf[i] = (uT[1][1] * max(xt1xt[0][1] * xt[i-1], xt1xt[0][0] * xf[i-1]))
+        else:       # If an Umbrella is not observed
+            xt[i] = (uF[0][0] * max(xt1xt[0][0] * xt[i-1], xt1xt[0][1] * xf[i-1]))
+            xf[i] = (uF[1][1] * max(xt1xt[0][1] * xt[i-1], xt1xt[0][0] * xf[i-1]))
+    print "xT: ", xt
+    print "xF: ", xf
 
 
 def main():
     print "Forward: "
-    forward(ev, prior)         # Task B
+    forward(evidence, initial)         # Task B
 
     print "\n", "-"*10
     print "Forward-Backward: "
-    forwardBackward(ev, prior)  # Task C
+    forwardbackward(evidence, initial)  # Task C
 
     print "\n", "-" * 10
     print "Viterbi: "
-    viterbi(ev, prior)          # Task C
+    viterbi(evidence, initial)          # Task C
 
 main()
