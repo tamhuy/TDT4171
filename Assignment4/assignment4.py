@@ -2,7 +2,7 @@ import random
 import math
 
 
-class Node:
+class Node:     # Nodes in the tree as class
     def __init__(self, data, leaf):
         self.data = data
         self.children = {}
@@ -12,16 +12,16 @@ class Node:
         self.children[key] = value
 
 
-def B(q):
+def B(q):   # Formula for entropy
     if q == 1 or q == 0:
         return 0
     return -(q * math.log(q, 2) + (1 - q) * math.log(1 - q, 2))
 
 
 def argmax(examples, attributes, rand):
-    if rand:
+    if rand:    # Choosing the attribute randomly
         return random.choice(attributes)
-    else:
+    else:       # Choosing the attribute using information gain
         gain = []
         for a in attributes:
             gain.append(importance(a, examples))
@@ -29,8 +29,7 @@ def argmax(examples, attributes, rand):
 
 
 def importance(a, examples):
-    # E0 = [p0, n0]
-    # E1 = [p1, n1]
+    # Importance function for finding argmax
     # E = [E0, E1] = [[p0, n0], [p1, n1]]
     # p = 1, n = 2
     E = [[0.0, 0.0], [0.0, 0.0]]
@@ -52,19 +51,21 @@ def importance(a, examples):
 
 
 def plurality_value(a):
+    # Plurality function for selecting most common output value
     return max(set(a), key=a.count)
 
 
 def decision_tree_learning(examples, attributes, parent_examples, rand):
-    qwe = []
+    # Creating a list to use with plurality function
+    output = []
     for example in examples:
-        qwe.append(example[len(example)-1])
+        output.append(example[len(example)-1])
     if not examples:
         return Node(plurality_value(parent_examples), True)
-    elif len(set(qwe)) == 1:
-        return Node(set(qwe).pop(), True)
+    elif len(set(output)) == 1:
+        return Node(set(output).pop(), True)
     elif not attributes:
-        return Node(plurality_value(qwe), True)
+        return Node(plurality_value(output), True)
     else:
         A = argmax(examples, attributes, rand)
         root = Node(A, False)
@@ -80,16 +81,14 @@ def decision_tree_learning(examples, attributes, parent_examples, rand):
     return root
 
 
-def readfile(file):
-    # Open training data and put it in a 2D list
-    with open(file, "r") as f:
+def readfile(filename):
+    # Reading the training set and creating a list
+    with open(filename, "r") as f:
         data = f.readlines()
-    list = []
+    datalist = []
     for line in data:
-        list.append([int(i) for i in line.split()])
-    #for i in examples:
-    #    print i
-    return list
+        datalist.append([int(i) for i in line.split()])
+    return datalist
 
 
 def count(tree, test):
@@ -101,14 +100,19 @@ def count(tree, test):
     return tree.data
 
 
-def main():
+def main(): 
+    # Loading the training set
     examples = readfile("data/training.txt")
     attributes = [x for x in range(len(examples[0])-1)]
+    # Training the decision tree
     tree = decision_tree_learning(examples, attributes, None, False)
+    # Loading the test file
     test = readfile("data/test.txt")
     counter = 0
+    # Counter for counting how many decisions are correct.
     for line in test:
         if count(tree, line) == line[len(line)-1]:
             counter += 1
     print counter
+
 main()
