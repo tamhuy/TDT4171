@@ -118,7 +118,7 @@ def main():
     examples = readfile("data/training.txt")
     attributes = [x for x in range(len(examples[0])-1)]
     # Training the decision tree
-    tree = decision_tree_learning(examples, attributes, None, True)
+    tree = decision_tree_learning(examples, attributes, None, False)
     # Loading the test file
     test = readfile("data/test.txt")
     counter = 0
