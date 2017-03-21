@@ -1,5 +1,6 @@
 import random
 import math
+import graphviz as gv
 
 
 class Node:     # Nodes in the tree as class
@@ -34,13 +35,13 @@ def importance(a, examples):
     # p = 1, n = 2
     E = [[0.0, 0.0], [0.0, 0.0]]
     for example in examples:
-        if example[a] == 1 and example[len(example) - 1] == 1:
+        if example[a] == 1 and example[-1] == 1:
             E[0][0] += 1
-        elif example[a] == 1 and example[len(example) - 1] == 2:
+        elif example[a] == 1 and example[-1] == 2:
             E[0][1] += 1
-        elif example[a] == 2 and example[len(example) - 1] == 1:
+        elif example[a] == 2 and example[-1] == 1:
             E[1][0] += 1
-        elif example[a] == 2 and example[len(example) - 1] == 2:
+        elif example[a] == 2 and example[-1] == 2:
             E[1][1] += 1
     p = E[0][0] + E[1][0]
     n = E[0][1] + E[1][1]
@@ -52,14 +53,14 @@ def importance(a, examples):
 
 def plurality_value(a):
     # Plurality function for selecting most common output value
-    return max(set(a), key=a.count)
+    return max(set([x[-1] for x in a]), key=a.count)
 
 
 def decision_tree_learning(examples, attributes, parent_examples, rand):
     # Creating a list to use with plurality function
     output = []
     for example in examples:
-        output.append(example[len(example)-1])
+        output.append(example[-1])
     if not examples:
         return Node(plurality_value(parent_examples), True)
     elif len(set(output)) == 1:
@@ -100,12 +101,24 @@ def count(tree, test):
     return tree.data
 
 
-def main(): 
+def draw(g, tree, parent):
+    if not tree.leaf:
+        g.node(repr(tree), str(tree.data))
+        draw(g, tree.children[1], tree)
+        draw(g, tree.children[2], tree)
+    else:
+        g.node(repr(tree), str(tree.data))
+    if parent is not None:
+        g.edge(repr(parent), repr(tree))
+    return g
+
+
+def main():
     # Loading the training set
     examples = readfile("data/training.txt")
     attributes = [x for x in range(len(examples[0])-1)]
     # Training the decision tree
-    tree = decision_tree_learning(examples, attributes, None, False)
+    tree = decision_tree_learning(examples, attributes, None, True)
     # Loading the test file
     test = readfile("data/test.txt")
     counter = 0
@@ -114,5 +127,7 @@ def main():
         if count(tree, line) == line[len(line)-1]:
             counter += 1
     print counter
-
+    g = gv.Digraph(format='svg')
+    g = draw(g, tree, None)
+    g.render('g')
 main()
