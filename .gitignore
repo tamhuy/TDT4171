@@ -143,3 +143,7 @@ fabric.properties
 # *.ipr
 .idea/
 # End of https://www.gitignore.io/api/pycharm
+
+Assignment4/g
+Assignment4/g.svg
+
